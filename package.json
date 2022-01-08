@@ -1,0 +1,19 @@
+{
+  "name": "kellerautomat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andreasrieger/kellerautomat.git"
+  },
+  "author": "Andreas Rieger",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andreasrieger/kellerautomat/issues"
+  },
+  "homepage": "https://github.com/andreasrieger/kellerautomat#readme"
+}
