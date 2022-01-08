@@ -171,10 +171,10 @@ const isOperator = (value) => {
  * @returns true if expression is valid, otherwise false
  */
 const isValidExpression = (expression) => {
-    console.log(`test parantheses: ${expression}`)
+    console.log(`to test: ${expression}`)
     
     // check if expression is starting or ending with a digit
-    if (!isDigit(stack[0]) && !isDigit(stack[sL - 1])) {
+    if (!isDigit(expression[0]) && !isDigit(expression[expression.length - 1])) {
         return false
     }
     
@@ -194,6 +194,8 @@ const isValidExpression = (expression) => {
         }
     }
 
+    // @To do: checking the expressions validity -> ZOZ | (ZOZ)
+
     // check if stack is emty
     return (stack.length != 0) ? false : true
 };
@@ -210,4 +212,4 @@ const E = (bool) => {
 };
 
 
-E(true);
+E(false);
