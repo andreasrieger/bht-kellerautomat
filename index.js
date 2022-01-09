@@ -12,7 +12,6 @@ const
 
 const eL = 5; // expression length
 
-
 /**
  * Helper method to return the smallest value of an array
  *
@@ -113,6 +112,7 @@ const C = (expression) => {
 /**
  * Returning a given expression expanded by an additional
  * operator and operand on the left side
+ * 
  * @param {*} expression
  * @returns a new expression
  */
@@ -162,6 +162,41 @@ const isOperator = (value) => {
     return false
 };
 
+
+/**
+ * Helper method to return a string if stack is empty
+ * 
+ * @param {*} stack 
+ * @returns last stack element if stack length ist greater than 0(zero), 
+ * otherwise an empty string
+ */
+const stackTop = stack => {
+    return (stack.length > 0) ? stack[stack.length - 1] : '';
+};
+
+
+/**
+ * Method to store state, head, top (of stack) and stack as object
+ * 
+ * @param {*} state 
+ * @param {*} head 
+ * @param {*} top 
+ * @param {*} stack
+ * @param {*} valid
+ * @returns object with elements
+ */
+const stateObject = (state, head, top, stack, valid) => {
+    stack = stack.join('').toString();
+    return {
+        state: state,
+        head: head,
+        top: top,
+        stack: stack,
+        valid: valid
+    };
+};
+
+
 /**
  * Checking an expressions' validity:
  * 1. Starting or ending with a digit
@@ -172,44 +207,82 @@ const isOperator = (value) => {
  */
 const isValidExpression = (expression) => {
     console.log(`to test: ${expression}`)
-    
+
+
+    const states = []; // state storage
+
     // check if expression is starting or ending with a digit
-    if (!isDigit(expression[0]) && !isDigit(expression[expression.length - 1])) {
-        return false
-    }
-    
+    // if (!isDigit(expression[0]) && !isDigit(expression[expression.length - 1])) {
+    //     return false
+    // }
+
     // iterating through the expression
-    const stack = [];
+    const stack = ['$'];
+    states.push(stateObject(0, "eps", stackTop(stack), stack))
+    stack.pop()
+
     for (let i = 0, l = expression.length; i < l; i++) {
+
 
         // putting opening bracket onto the stack
         if (expression[i] == '(') {
             stack.push(expression[i])
+            states.push(stateObject(0, expression[i], stackTop(stack), stack))
         }
 
         // empty stack including previous opening bracket
         if (expression[i] == ')') {
-            if (stack.length > 0) stack.pop()
-            else return false
+            if (stack.length > 0) {
+                states.push(stateObject(1, expression[i], stackTop(stack), stack))
+                stack.pop()
+            }
+            else {
+                states.push(stateObject(2, expression[i], stackTop(stack), stack, false))
+                return states
+            }
         }
     }
 
-    // @To do: checking the expressions validity -> ZOZ | (ZOZ)
-
     // check if stack is emty
-    return (stack.length != 0) ? false : true
+    if (stack.length != 0) {
+        states.push(stateObject(2, "eps", stackTop(stack), stack, false))
+        return states
+    } else {
+        states.push(stateObject(2, 0, stackTop(stack), stack, true))
+        return states
+    }
 };
+
+
 
 
 /**
  * Generating a valid expression (true) or otherwise potentially invalid
  * 
  * @param {*} bool 
+ * @returns an object with the generated expression and the stored states
  */
 const E = (bool) => {
     const expression = (bool) ? A() : makeInvalid(A());
-    console.log("valid expression? " + isValidExpression(expression))
+    const states = isValidExpression(expression)
+    return {
+        expression: expression,
+        states: states
+    }
 };
 
 
-E(false);
+/**
+ * Validating a user generated expression
+ * 
+ * @param {*} userinput 
+ * @returns an object with the user generated expression and the stored states
+ */
+function main(userinput) {
+    const expression = userinput;
+    const states = isValidExpression(expression);
+    return {
+        expression: expression,
+        states: states
+    }
+}
