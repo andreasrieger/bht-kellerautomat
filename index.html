@@ -36,167 +36,169 @@
                 </p>
             </div>
         </div>
-        <div><label for="input">Geben Sie entweder einen arithmetischen Ausdruck ein oder starten Sie direkt ohne
-            Eingabe.</label><input id="input" type="text" value="" placeholder="Ausdruck eingeben..." />
-            
+        <div class="input-group mb-3">
+            <input id="input" class="form-control" type="text" value="" placeholder="Ausdruck eingeben..." />
+            <button id="startResetButton" class="btn btn-outline-secondary active">Start</button>
         </div>
-        <button id="startResetButton" class="active">Start</button>
+        <div>
+            <label for="input">Geben Sie entweder einen arithmetischen Ausdruck ein oder starten Sie direkt ohne
+                Eingabe.</label></div>
         <div id="output"></div>
-    </div>    
-        <script src="./index.js"></script>
+    </div>
+    <script src="./index.js"></script>
 
-        <script>
+    <script>
 
-            const createNewElement = (nodeElement, elementId, elementClass, elementType, elementTitle, elementLabel) => {
-                const element = document.createElement(nodeElement);
-                element.setAttribute("id", elementId);
-                element.setAttribute("class", elementClass);
-                element.setAttribute("type", elementType);
-                element.setAttribute("title", elementTitle);
-                element.innerText = elementLabel;
-                return element;
+        const createNewElement = (nodeElement, elementId, elementClass, elementType, elementTitle, elementLabel) => {
+            const element = document.createElement(nodeElement);
+            element.setAttribute("id", elementId);
+            element.setAttribute("class", elementClass);
+            element.setAttribute("type", elementType);
+            element.setAttribute("title", elementTitle);
+            element.innerText = elementLabel;
+            return element;
+        };
+
+
+        const newTable = id => {
+            const table = document.createElement("table");
+            table.setAttribute("id", id)
+            return table
+        };
+
+
+        const tableHeader = state => {
+            // console.log(state)
+            const headerNames = {
+                state: "aktueller Zustand",
+                head: "Eingabezeichen",
+                top: "Kellerzeichen",
+                stack: "Gesamter Kellerspeicher"
             };
+            const outputTable = document.getElementById("transitions");
+            const tableHeader = outputTable.createTHead();
+            const headerRow = tableHeader.insertRow(0);
+
+            for (const [key, value] of Object.entries(headerNames)) {
+                console.log(key)
+                const header = headerNames.key;
+                const tableCell = headerRow.insertCell();
+                tableCell.setAttribute("scope", "col")
+                const newText = document.createTextNode(value);
+                tableCell.appendChild(newText);
+            }
+        };
+
+        const toggleStartResetButton = state => {
+            const button = document.getElementById("startResetButton");
+            if (state == "active") {
+                button.classList.replace("active", "reset");
+                button.classList.replace("btn-primary", "btn-outline-warning")
+                button.innerText = "Reset";
+                button.setAttribute("data-bs-toggle", "tooltip");
+                button.setAttribute("data-bs-placement", "top");
+                button.setAttribute("title", "Ausgabe unterbrechen und Anwendung zurücksetzen.");
+            } else {
+
+                button.classList.replace("reset", "active");
+                button.classList.replace("btn-outline-warning", "btn-primary")
+                button.innerText = "Start";
+                button.setAttribute("data-bs-toggle", "tooltip");
+                button.setAttribute("data-bs-placement", "top");
+                button.setAttribute("title", "Arithmetischen Ausdruck prüfen und Ausgabe starten.");
+            }
+        };
+
+        const stateOutput = response => {
+
+            let counter = 0;
+            const arr = [];
+
+            for (const state of response["states"]) {
+                arr.push(state)
+            }
+
+            const outputWrap = document.getElementById("output");
+
+            const alertBox = document.createElement("div");
+            alertBox.setAttribute("id", "resultOutput")
+            alertBox.setAttribute("class", "alert alert-secondary")
+            alertBox.setAttribute("role", "alert")
+            alertBox.innerText = "Der zu überprüfende Ausdruck lautet: " + response["expression"];
+            outputWrap.appendChild(alertBox)
 
 
-            const newTable = id => {
-                const table = document.createElement("table");
-                table.setAttribute("id", id)
-                return table
-            };
+            const nextButton = createNewElement("button", "nextButton", "btn btn-secondary control-button", "button", "Ausgabe einer weiteren Zeile", "Nächste Zeile");
+            outputWrap.appendChild(nextButton);
 
+            const outputTable = newTable("transitions");
+            outputWrap.appendChild(outputTable)
 
-            const tableHeader = state => {
-                // console.log(state)
-                const headerNames = {
-                    state: "aktueller Zustand",
-                    head: "Eingabezeichen",
-                    top: "Kellerzeichen",
-                    stack: "Gesamter Kellerspeicher"
-                };
-                const outputTable = document.getElementById("transitions");
-                const tableHeader = outputTable.createTHead();
-                const headerRow = tableHeader.insertRow(0);
-
-                for (const [key, value] of Object.entries(headerNames)) {
-                    console.log(key)
-                    const header = headerNames.key;
-                    const tableCell = headerRow.insertCell();
-                    tableCell.setAttribute("scope", "col")
-                    const newText = document.createTextNode(value);
-                    tableCell.appendChild(newText);
-                }
-            };
-
-            const toggleStartResetButton = state => {
-                const button = document.getElementById("startResetButton");
-                if (state == "active") {
-                    button.classList.replace("active", "reset");
-                    button.classList.replace("btn-primary", "btn-outline-warning")
-                    button.innerText = "Reset";
-                    button.setAttribute("data-bs-toggle", "tooltip");
-                    button.setAttribute("data-bs-placement", "top");
-                    button.setAttribute("title", "Ausgabe unterbrechen und Anwendung zurücksetzen.");
-                } else {
-
-                    button.classList.replace("reset", "active");
-                    button.classList.replace("btn-outline-warning", "btn-primary")
-                    button.innerText = "Start";
-                    button.setAttribute("data-bs-toggle", "tooltip");
-                    button.setAttribute("data-bs-placement", "top");
-                    button.setAttribute("title", "Arithmetischen Ausdruck prüfen und Ausgabe starten.");
-                }
-            };
-
-            const stateOutput = response => {
-
-                let counter = 0;
-                const arr = [];
-
-                for (const state of response["states"]) {
-                    arr.push(state)
-                }
-
-                const outputWrap = document.getElementById("output");
-
-                const alertBox = document.createElement("div");
-                alertBox.setAttribute("id", "resultOutput")
-                alertBox.setAttribute("class", "alert")
-                alertBox.setAttribute("role", "alert")
-                alertBox.innerText = "Der zu überprüfende Ausdruck lautet: " + response["expression"];
-                outputWrap.appendChild(alertBox)
-
-
-                const nextButton = createNewElement("button", "nextButton", "control-button", "button", "Ausgabe einer weiteren Zeile", "Nächste Zeile");
-                outputWrap.appendChild(nextButton);
-
-                const outputTable = newTable("transitions");
-                outputWrap.appendChild(outputTable)
-
-                if (document.getElementById("nextButton")) {
-                    document.getElementById("nextButton").addEventListener("click", () => {
-                        if (counter == 0) tableHeader(arr[counter])
-                        if (counter < arr.length) {
-                            // console.log(arr[counter])
-                            nextStep(arr[counter])
-                            if (counter == arr.length - 1 && arr[counter]["valid"]) {
-                                alert("Der Automat akzeptiert den Ausdruck.")
-                            } else if (counter == arr.length - 1 && !arr[counter]["valid"]) {
-                                alert("Der Automat hat den Ausdruck nicht erkannt.")
-                            }
-                            counter += 1;
+            if (document.getElementById("nextButton")) {
+                document.getElementById("nextButton").addEventListener("click", () => {
+                    if (counter == 0) tableHeader(arr[counter])
+                    if (counter < arr.length) {
+                        // console.log(arr[counter])
+                        nextStep(arr[counter])
+                        if (counter == arr.length - 1 && arr[counter]["valid"]) {
+                            alert("Der Automat akzeptiert den Ausdruck.")
+                        } else if (counter == arr.length - 1 && !arr[counter]["valid"]) {
+                            alert("Der Automat hat den Ausdruck nicht erkannt.")
                         }
-                        if (counter == arr.length) {
-                            nextButton.setAttribute("disabled", "")
-                        }
-                    })
-                }
-            };
-
-
-            const nextStep = state => {
-                const outputTable = document.getElementById("transitions");
-                const tableRow = outputTable.insertRow();
-                for (const [key, value] of Object.entries(state)) {
-                    if (key != "valid") {
-                        const tableCell = tableRow.insertCell();
-                        tableCell.appendChild(document.createTextNode(value))
-                        tableRow.appendChild(tableCell)
+                        counter += 1;
                     }
-                }
-                outputTable.appendChild(tableRow)
-            };
-
-
-            const resetOutput = () => {
-                const outputWrap = document.getElementById("output");
-                while (outputWrap.firstChild) {
-                    outputWrap.removeChild(outputWrap.firstChild);
-                }
-            };
-
-            /**
-            * Init general frontend interaction options
-            */
-            document.addEventListener("DOMContentLoaded", function (event) {
-
-                const startResetButton = document.getElementById("startResetButton");
-                startResetButton.addEventListener("click", () => {
-
-                    if (startResetButton.classList.contains("active")) {
-                        resetOutput()
-                        const input = document.getElementById("input");
-                        const response = (input.value != "") ? main(input.value) : E(false); // handling over to backend
-                        stateOutput(response);
-                        toggleStartResetButton("active")
-                    } else if (startResetButton.classList.contains("reset")) {
-                        resetOutput()
-                        toggleStartResetButton("reset")
+                    if (counter == arr.length) {
+                        nextButton.setAttribute("disabled", "")
                     }
                 })
+            }
+        };
 
+
+        const nextStep = state => {
+            const outputTable = document.getElementById("transitions");
+            const tableRow = outputTable.insertRow();
+            for (const [key, value] of Object.entries(state)) {
+                if (key != "valid") {
+                    const tableCell = tableRow.insertCell();
+                    tableCell.appendChild(document.createTextNode(value))
+                    tableRow.appendChild(tableCell)
+                }
+            }
+            outputTable.appendChild(tableRow)
+        };
+
+
+        const resetOutput = () => {
+            const outputWrap = document.getElementById("output");
+            while (outputWrap.firstChild) {
+                outputWrap.removeChild(outputWrap.firstChild);
+            }
+        };
+
+        /**
+        * Init general frontend interaction options
+        */
+        document.addEventListener("DOMContentLoaded", function (event) {
+
+            const startResetButton = document.getElementById("startResetButton");
+            startResetButton.addEventListener("click", () => {
+
+                if (startResetButton.classList.contains("active")) {
+                    resetOutput()
+                    const input = document.getElementById("input");
+                    const response = (input.value != "") ? main(input.value) : E(false); // handling over to backend
+                    stateOutput(response);
+                    toggleStartResetButton("active")
+                } else if (startResetButton.classList.contains("reset")) {
+                    resetOutput()
+                    toggleStartResetButton("reset")
+                }
             })
 
-        </script>
+        })
+
+    </script>
 </body>
 
 </html>
