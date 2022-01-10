@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Kellerautomat</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.html">Zurück zur Startseite</a>
+                    </li>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-2"></div>
+            <div class="col-8 mb-3">
+                <h1 class="h3">Realisierung einer Webanwendung zur Simulation eines Kellerautomaten</h1>
+                <p>Autor: Andreas Rieger<br />Datum: 10.01.2022</p>
+                <h2 class="h4">Aufgabenstellung</h2>
+                <p>Erzeugen Sie mit Hilfe der Grammatik aus Aufgabe P2 einen zufälligen arithmetische Ausdruck. Es sollt
+                    auch möglich sein einen [wahrscheinlich] fehlerhaften Ausdruck zu erzeugen. Dazu löschen Sie einfach
+                    ein beliebiges Zeichen aus dem Ausdruck. Prüfen Sie den erzeugten Ausdruck mittels eines
+                    Kellerautomaten.
+                </p>
+                <h2 class="h4">Visualisierung</h2>
+                <p>Die Generierung der Ausdrücke mittels der Grammatik wird nicht angezeigt. Der Kellerautomaten soll
+                    als Tabelle und als Graph dargestellt werden. Die Verarbeitung der Eingabe durch den Automaten kann
+                    gleichzeitig schrittweise in der Tabelle der Überführungsfunktion und im Graphen nachvollzogen
+                    werden. Schließlich wird das Endzustand und das Ergebnis (erkannt oder nicht erkannt) des Automaten
+                    dargestellt.</p>
+                <h2 class="h4">Technische Dokumentation</h2>
+                <p>Die Anwendung basiert auf HTML, CSS und Javascript.</p>
+                <p>Zur Visualisierung der Oberfl&auml;che wurde das Framework
+                    <a href="https://getbootstrap.com/">Bootstrap v5.1</a> verwendet. Bootstrap liefert eine
+                    einheitliche, gut strukturierte und responsive
+                    Benutzeroberfl&auml;che, die sich verschiedenen Endger&auml;ten anpassen l&auml;sst. Außerdem hält
+                    das Framework viele vordefinierte und ansprechend gestaltete Komponenten zur Interaktion bereit.
+                </p>
+                <h2 class="h4">Fachliche Dokumentation</h2>
+                <p>Zunächst erfolgt die Eingabe des zu prüfenden arithmetischen Ausdrucks per Formular. Alternativ dazu
+                    erstellt die Anwendung im Hintergrund einen zufälligen aber korrekten Ausdruck.</p>
+                <p>Übergabe der Formulardaten an das Backend bzw. Start des Zufallsgenerators.</p>
+                <pre>const response = (input.value != "") ? main(input.value) : E(false);</pre>
+                <p class="h6">Erzeugung eines zufälligen korrekten Ausdrucks.</p>
+                <pre>const A = () => {
+                    let expression = randomZ().toString();
+                    for (let i = 1; i < eL; i++) {
+                        expression = (i < 2 || i == eL) ? randomCD(expression) : randomCD(B(expression));
+                    }
+                    return expression
+                };</pre>
+                <p>Anschließend wird ein beliebiges Zeichen entfernt, so dass der Ausdruck wahrscheinlich fehlerhaft ist
+                </p>
+                <p class="h6">Entfernung eines beliebigen Zeichens</p>
+                <pre>const makeInvalid = (expression) => {
+                    const min = 0;
+                    const max = expression.length - 1;
+                    const e2R = Math.floor(Math.random() * (max - min + 1)) + min;
+                    return expression.slice(0, e2R) + expression.slice(e2R + 1);
+                };</pre>
+                <p>Der eingegebene bzw. erstellte Ausdruck und die Prüfschritte werden anschließend als Objekt zur Ausgabe an das
+                    Frontend zurückgegeben.</p>
+                <p class="h6">Rückgabe an das Frontend</p>
+                <pre>const E = (bool) => {
+                        const expression = (bool) ? A() : makeInvalid(A());
+                        const states = isValidExpression(expression)
+                        return {
+                            expression: expression,
+                            states: states
+                        }
+                    };</pre>
+                <p class="h6">Ausgabe des Ausdrucks und der Zustände</p>
+                <p>Hierfür werden die Zustände in ein neues Objekt (Array) eingelesen und anschließend zeilenweise ausgegeben.</p>
+                <pre>const stateOutput = response => {
+
+                    let counter = 0;
+                    const arr = [];
+        
+                    // Einlesen der Zustände in neues Objekt 
+                    for (const state of response["states"]) {
+                        arr.push(state)
+                    }
+        
+                    ...
+        
+                    if (document.getElementById("nextButton")) {
+                        document.getElementById("nextButton").addEventListener("click", () => {
+                            if (counter == 0) tableHeader(arr[counter])
+                            if (counter < arr.length) {
+                                console.log(arr[counter])
+                                nextStep(arr[counter])
+                                if (counter == arr.length - 1 && arr[counter]["valid"]) {
+                                    alert("Der Automat akzeptiert den Ausdruck.")
+                                } else if (counter == arr.length - 1 && !arr[counter]["valid"]) {
+                                    alert("Der Automat hat den Ausdruck nicht erkannt.")
+                                }
+                                counter += 1;
+                            }
+                        })
+                    }
+                };</pre>
+                <p class="h6">Zeilenweise Ausgabe der Automatenzustände</p>
+                <pre>const nextStep = state => {
+                    const outputTable = document.getElementById("transitions");
+                    const tableRow = outputTable.insertRow();
+                    for (const [key, value] of Object.entries(state)) {
+                        if (key != "valid") {
+                            const tableCell = tableRow.insertCell();
+                            tableCell.appendChild(document.createTextNode(value))
+                            tableRow.appendChild(tableCell)
+                        }
+                    }
+                    outputTable.appendChild(tableRow)
+                };</pre>
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

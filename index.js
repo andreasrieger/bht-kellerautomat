@@ -81,7 +81,7 @@ const A = () => {
     for (let i = 1; i < eL; i++) {
         expression = (i < 2 || i == eL) ? randomCD(expression) : randomCD(B(expression));
     }
-    console.log(`Original: ${expression}`)
+    // console.log(`Original: ${expression}`)
     return expression
 };
 
